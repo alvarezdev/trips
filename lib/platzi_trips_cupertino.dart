@@ -9,7 +9,6 @@ import 'User/ui/screens/profile_trips.dart';
 class PlatziTripsCupertino extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    // TODO: implement build
     return Scaffold(
       bottomNavigationBar: CupertinoTabScaffold(
         tabBar: CupertinoTabBar(
@@ -40,12 +39,10 @@ class PlatziTripsCupertino extends StatelessWidget {
                   );
                 },
               );
-              break;
             case 1:
               return CupertinoTabView(
                 builder: (BuildContext context) => SearchTrips(),
               );
-              break;
             case 2:
               return CupertinoTabView(
                 builder: (BuildContext context){
@@ -54,12 +51,10 @@ class PlatziTripsCupertino extends StatelessWidget {
                       child: ProfileTrips());
                 },
               );
-              break;
             default:
               return CupertinoTabView(
                 builder: (BuildContext context) => HomeTrips(),
               );
-              break;
           }
         },
       ),

@@ -29,10 +29,12 @@ class AddPlaceScreen extends StatefulWidget {
 }
 
 class _AddPlaceScreen extends State<AddPlaceScreen> {
+
+  UserBloc? userBloc;
   @override
   Widget build(BuildContext context) {
 
-    UserBloc userBloc = BlocProvider.of<UserBloc>(context);
+    userBloc = BlocProvider.of<UserBloc>(context);
     final _controllerTitlePlace = TextEditingController();
     final _controllerDescriptionPlace = TextEditingController();
 
@@ -80,7 +82,8 @@ class _AddPlaceScreen extends State<AddPlaceScreen> {
                   margin: const EdgeInsets.only(bottom: 20.0 ),
                   alignment: Alignment.center,
                   child: CardImageWithFabIcon(
-                    image: Image.file(File(widget.file!.path)),
+                    onPressedFabIcon: () => { },
+                    image: widget.file,//Image.file(File(widget.file != null ? widget.file!.path : "")),
                     width: 350.0,
                     height: 250.0,
                     iconData: Icons.camera_alt,
@@ -154,5 +157,4 @@ class _AddPlaceScreen extends State<AddPlaceScreen> {
       ),
     );
   }
-
 }

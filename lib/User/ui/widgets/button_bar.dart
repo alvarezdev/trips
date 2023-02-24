@@ -1,4 +1,3 @@
-import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:generic_bloc_provider/generic_bloc_provider.dart';
 import 'package:image_picker/image_picker.dart';
@@ -37,7 +36,12 @@ class ButtonsBar extends StatelessWidget {
   openCameraAndGotoAddPlace(BuildContext context) async {
     await ImagePicker().pickImage(
         source: ImageSource.camera
-      ).then((file) => gotoAddPlace(context, file)
+      ).then((file)
+        {
+          if (file != null) {
+            gotoAddPlace(context, file);
+          }
+        }
     );
   }
 

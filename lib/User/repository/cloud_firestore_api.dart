@@ -1,7 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutter/material.dart';
-import 'package:trips/Place/ui/widgets/card_image_with_fab_icon.dart';
 import 'package:trips/User/model/user_model.dart';
 
 import '../../Place/model/place.dart';
@@ -29,15 +27,14 @@ class CloudFirestoreAPI{
 
   Future<void> updatePlaceData(Place place) async{
     CollectionReference refPlace = _db.collection(PLACES);
-
     User? user = _auth.currentUser;
-
     await refPlace.add({
-        'name' : place.name,
-        'description' : place.description,
-        'likes' : place.likes,
-        'urlImage' : place.urlImage,
-        'userOwner' : _db.doc("$USERS/${user!.uid}")
+      'name' : place.name,
+      'description' : place.description,
+      'likes' : place.likes,
+      'urlImage' : place.urlImage,
+      'userOwner' : _db.doc("$USERS/${user!.uid}"),
+      'usersLiked' : place.usersLiked
     }).then((docRef) {
       docRef.get().then((snapshot) {
         DocumentReference refUsers = _db.collection(USERS).doc(user.uid);
@@ -51,36 +48,55 @@ class CloudFirestoreAPI{
   List<ProfilePlace> buildMyPlaces(List<DocumentSnapshot> placesListSnapshot){
     List<ProfilePlace> profilesPlaces = List.of(<ProfilePlace>[]);
     placesListSnapshot.forEach((element) {
-      profilesPlaces.add(ProfilePlace(Place(
-        name: element.get('name'),
-        description: element.get('description'),
-        urlImage: element.get('urlImage'),
-        likes: element.get('likes')
-      )));
-    });
-    return profilesPlaces;
-  }
-
-  List<CardImageWithFabIcon> buildPlaces(List<DocumentSnapshot> placesListSnapshot){
-    List<CardImageWithFabIcon> profilesPlaces = List.of(<CardImageWithFabIcon>[]);
-    placesListSnapshot.forEach((element) {
-      profilesPlaces.add(CardImageWithFabIcon(
-          onPressedFabIcon: () => likePlace(element.id),
-          image: Image.network(element.get("urlImage")),
-          width: 300.0,
-          height: 300.0,
-          iconData: Icons.favorite_border)
+      profilesPlaces.add(ProfilePlace(
+          Place(
+            //id: element.get('id'),
+            name: element.get('name'),
+            description: element.get('description'),
+            urlImage: element.get('urlImage'),
+            likes: element.get('likes')
+          )
+        )
       );
     });
     return profilesPlaces;
   }
 
-  Future likePlace(String idPlace) async{
-    await _db.collection(PLACES).doc(idPlace).get().then((documentSnapshot) {
-      int likes = documentSnapshot.get("likes");
+  List<Place> buildPlaces(List<DocumentSnapshot> placesListSnapshot){
+    List<Place> profilesPlaces = List.of(<Place>[]);
+    User? user = _auth.currentUser;
+    placesListSnapshot.forEach((element) {
+      Place place = Place(
+        id: element.id,
+        name: element.get('name'),
+        description: element.get('description'),
+        urlImage: element.get('urlImage'),
+        likes: element.get('likes')
+      );
+      var usersLikedRefs =  element.get("usersLiked");
+      place.liked = false;
+      if (usersLikedRefs != null){
+        usersLikedRefs!.forEach((drUL){
+          if(user!.uid == drUL.id){
+            place.liked = true;
+          }
+        });
+      }
+      profilesPlaces.add(place);
+    });
+    return profilesPlaces;
+  }
 
-      _db.collection(PLACES).doc(idPlace).update({
-          'likes' : likes+1
+  Future likePlace(Place place) async{
+    await _db.collection(PLACES).doc(place.id).get().then((documentSnapshot) {
+      int likes = documentSnapshot.get('likes');
+      String uid = _auth.currentUser!.uid;
+      _db.collection(PLACES).doc(place.id).update({
+        'likes' : place.liked?likes + 1 : likes - 1,
+        'usersLiked':
+        place.liked?
+        FieldValue.arrayUnion([_db.doc("$USERS/$uid")]):
+        FieldValue.arrayRemove([_db.doc("$USERS/$uid")])
       });
     });
   }
