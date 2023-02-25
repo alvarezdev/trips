@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import '../../../widgets/floating_action_button_green.dart';
@@ -33,7 +35,7 @@ class  CardImageWithFabIcon extends StatelessWidget {
           fit: BoxFit.cover,
             //image: AssetImage(pathImage)
             //image: image!.image,
-            image: CachedNetworkImageProvider(image!.path)
+            image: internet! ? CachedNetworkImageProvider(image!.path) : Image.file(File(image!.path)).image,
         ),
         borderRadius: const BorderRadius.all(Radius.circular(10.0)),
         shape: BoxShape.rectangle,
@@ -44,7 +46,6 @@ class  CardImageWithFabIcon extends StatelessWidget {
             offset: Offset(0.0, 7.0)
           )
         ]
-
       ),
     );
 
@@ -59,5 +60,4 @@ class  CardImageWithFabIcon extends StatelessWidget {
       ],
     );
   }
-
 }

@@ -29,34 +29,55 @@ class _CardImageList extends State<CardImageList> {
           switch(snapshot.connectionState){
             case ConnectionState.none:
             case ConnectionState.waiting:
-            return const CircularProgressIndicator();
+            return const Center(child: CircularProgressIndicator());
             case ConnectionState.active:
             case ConnectionState.done:
-            return ListView(
-                padding: const EdgeInsets.all(25.0),
-                scrollDirection: Axis.horizontal,
-                children: userBloc!.buildPlaces(snapshot.data.docs).map((place){
-                  return CardImageWithFabIcon(
-                    onPressedFabIcon: () => {
-                      setLiked(place)
-                    },
-                    image: XFile(place.urlImage != null ? place.urlImage! : ""),//Image.network(place.urlImage!),
-                    width: 300.0,
-                    height: 250.0,
-                    iconData: place.liked ? Icons.favorite: Icons.favorite_border,
-                  );}).toList()
-            );
+            return listViewPlaces(userBloc!.buildPlaces(snapshot.data.docs));
           }
         }
       )
     );
   }
 
-  setLiked(Place place){
-    setState(() {
-      place.liked = !place.liked;
-      userBloc!.likePlace(place);
-    });
+  Widget listViewPlaces(List<Place> places){
+
+    setLiked(Place place){
+      setState(() {
+        place.liked = !place.liked;
+        userBloc!.likePlace(place);
+        int likes = place.likes!;
+        likes = place.liked ? likes + 1 : likes - 1;
+        userBloc!.placeSelectedSink.add(place);
+      });
+    }
+
+    return ListView(
+        padding: const EdgeInsets.all(25.0),
+        scrollDirection: Axis.horizontal,
+        children: places.map((place){
+          return GestureDetector(
+            onTap: (){
+              debugPrint("CLICK PLACE: ${place.name}");
+              userBloc!.placeSelectedSink.add(place);
+            },
+            child: CardImageWithFabIcon(
+              onPressedFabIcon: () => {
+                setLiked(place)
+              },
+              image: XFile(place.urlImage != null ? place.urlImage! : ""),//Image.network(place.urlImage!),
+              width: 300.0,
+              height: 250.0,
+              iconData: place.liked ? Icons.favorite: Icons.favorite_border,
+              internet: true,
+            )
+          );}
+        ).toList()
+    );
+
+
+
   }
+
+
 
 }

@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:io';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -43,6 +44,9 @@ class UserBloc implements Bloc{
       FirebaseFirestore.instance.collection(CloudFirestoreAPI().PLACES)
           .where("userOwner", isEqualTo: FirebaseFirestore.instance.doc("${CloudFirestoreAPI().USERS}/$uid")).snapshots();
 
+  StreamController placeSelectedStreamController =  StreamController();
+  Stream get placeSelectedStream => placeSelectedStreamController.stream;
+  StreamSink get placeSelectedSink =>  placeSelectedStreamController.sink;
 
   final _firebaseStorageRepository = FirebaseStorageRepository();
   UploadTask uploadFile(String path, File file) => _firebaseStorageRepository.uploadFile(path, file);

@@ -92,7 +92,7 @@ class CloudFirestoreAPI{
       int likes = documentSnapshot.get('likes');
       String uid = _auth.currentUser!.uid;
       _db.collection(PLACES).doc(place.id).update({
-        'likes' : place.liked?likes + 1 : likes - 1,
+        'likes' : place.liked ? likes + 1 : likes - 1,
         'usersLiked':
         place.liked?
         FieldValue.arrayUnion([_db.doc("$USERS/$uid")]):

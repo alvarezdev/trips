@@ -87,6 +87,7 @@ class _AddPlaceScreen extends State<AddPlaceScreen> {
                     width: 350.0,
                     height: 250.0,
                     iconData: Icons.camera_alt,
+                    internet: false,
                   ),
                 ),
                 Container(
